@@ -9,7 +9,6 @@ package
 	import feathers.controls.Slider;
 	import feathers.controls.TextInput;
 	import feathers.display.TiledImage;
-	import feathers.events.FeathersEventType;
 	import feathers.layout.HorizontalLayout;
 	import feathers.layout.VerticalLayout;
 	import feathers.themes.MetalWorksMobileTheme;
@@ -24,6 +23,7 @@ package
 	import starling.extensions.deferredShading.Material;
 	import starling.extensions.deferredShading.display.DeferredShadingContainer;
 	import starling.extensions.deferredShading.lights.AmbientLight;
+	import starling.extensions.deferredShading.lights.Light;
 	import starling.extensions.deferredShading.lights.PointLight;
 	import starling.textures.Texture;
 	
@@ -103,6 +103,7 @@ package
 			// Add point light
 			
 			pointLight = new PointLight(0xFFFFFF, 1.0, 500);
+			pointLight.castsShadows = true;
 			dsc.addChild(pointLight);
 			
 			// Light marker
@@ -152,7 +153,7 @@ package
 			
 			cb = new Check();
 			cb.label = 'Light casts shadows';
-			cb.isSelected = false;
+			cb.isSelected = true;
 			cb.addEventListener(Event.CHANGE, 
 				function(e:Event):void
 				{
