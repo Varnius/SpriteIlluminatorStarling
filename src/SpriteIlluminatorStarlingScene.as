@@ -20,14 +20,12 @@ package
     import starling.events.Touch;
     import starling.events.TouchEvent;
     import starling.events.TouchPhase;
-    import starling.extensions.deferredShading.Material;
-    import starling.extensions.deferredShading.debug.DebugImage;
-    import starling.extensions.deferredShading.debug.DebugImageStyle;
-    import starling.extensions.deferredShading.display.DeferredShadingContainer;
-    import starling.extensions.deferredShading.lights.AmbientLight;
-    import starling.extensions.deferredShading.lights.PointLight;
-    import starling.extensions.deferredShading.lights.rendering.PointLightStyle;
-    import starling.extensions.deferredShading.rendering.PlusMeshStyle;
+    import starling.extensions.rendererPlus.Material;
+    import starling.extensions.rendererPlus.display.RendererPlus;
+    import starling.extensions.rendererPlus.lights.AmbientLight;
+    import starling.extensions.rendererPlus.lights.PointLight;
+    import starling.extensions.rendererPlus.lights.rendering.LightStyle;
+    import starling.extensions.rendererPlus.lights.rendering.PointLightStyle;
     import starling.textures.Texture;
 
     public class SpriteIlluminatorStarlingScene extends Sprite
@@ -52,20 +50,15 @@ package
         public function SpriteIlluminatorStarlingScene()
         {
             if(!stage)
-            {
                 addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-            }
             else
-            {
                 onAddedToStage();
-            }
         }
 
         private function onAddedToStage(e:Event = null):void
         {
             setupScene();
-//            setupUI();
-            setupDebug();
+            setupUI();
         }
 
         private var marker:Image;
@@ -74,7 +67,7 @@ package
         private var BGMaterial:Material;
         private var charMaterial:Material;
 
-        private var dsc:DeferredShadingContainer;
+        private var renderer:RendererPlus;
 
         private function setupScene():void
         {
@@ -83,14 +76,13 @@ package
 
             // Create DeferredShadingContainer
 
-            dsc = new DeferredShadingContainer();
-            addChild(dsc);
+            renderer = new RendererPlus();
+            addChild(renderer);
 
             // Create background wall
 
             BGMaterial = new Material(Texture.fromEmbeddedAsset(WALL), Texture.fromEmbeddedAsset(WALL_N));
-            dsc.addChild(tile = new Image(BGMaterial));
-            tile.style = new PlusMeshStyle();
+            renderer.addChild(tile = new Image(BGMaterial));
             tile.width = stage.stageWidth;
             tile.height = stage.stageHeight;
             tile.tileGrid = new Rectangle();
@@ -98,30 +90,25 @@ package
             // Create character
 
             charMaterial = new Material(Texture.fromEmbeddedAsset(CHAR), Texture.fromEmbeddedAsset(CHAR_N));
-            dsc.addChild(image = new Image(charMaterial));
-            image.style = new PlusMeshStyle();
+            renderer.addChild(image = new Image(charMaterial));
+            renderer.addOccluder(image);
             image.x = 200;
             image.y = 100;
-            dsc.addOccluder(image);
 
             // Add ambient light
 
             ambient = new AmbientLight();
-            ambient.color = 0x888888;
-            dsc.addChild(ambient);
+            (ambient.style as LightStyle).color = 0x222222;
+            renderer.addChild(ambient);
 
             // Add point light
 
-            pointLight = new PointLight();
-            (pointLight.style as PointLightStyle).castsShadows = false;
-            (pointLight.style as PointLightStyle).radius = 100;
-            dsc.addChild(pointLight);
+            renderer.addChild(pointLight = new PointLight());
 
-            var qq:Quad = new Quad(55,55);
-            qq.style = new PlusMeshStyle();
-            dsc.addChild(qq);
-            qq.x = 200;qq.y = 200;
-            stage.addEventListener(Event.ENTER_FRAME, function(e:Event) { qq.rotation += 0.01; });
+            var style:PointLightStyle = pointLight.style as PointLightStyle;
+            style.castsShadows = true;
+            style.strength = 1.5;
+            style.radius = 500;
 
             // Light marker
 
@@ -133,35 +120,7 @@ package
             onTouch();
         }
 
-        private var diffuse:DebugImage;
-        private var normals:DebugImage;
-        private var depth:DebugImage;
-
         private var UIContainer:ScrollContainer;
-
-        private function setupDebug():void
-        {
-//             todo: remove me
-
-            addChild(diffuse = new DebugImage(dsc.diffuseRT));
-            diffuse.width = 300;
-            diffuse.height = 180;
-            diffuse.x = stage.stageWidth - 300;
-
-            addChild(normals = new DebugImage(dsc.normalsRT));
-            normals.width = 300;
-            normals.height = 180;
-            normals.x = stage.stageWidth - 300;
-            normals.y = 180;
-
-            addChild(depth = new DebugImage(dsc.depthRT));
-            (depth.style as DebugImageStyle).showChannel = 0;
-            depth.width = 300;
-            depth.height = 180;
-            depth.x = stage.stageWidth - 300;
-            depth.y = 360;
-
-        }
 
         private function setupUI():void
         {
@@ -202,7 +161,8 @@ package
             cb.addEventListener(Event.CHANGE,
                     function (e:Event):void
                     {
-                        //pointLight.castsShadows = !pointLight.castsShadows;
+                        var style:PointLightStyle = pointLight.style as PointLightStyle;
+                        style.castsShadows = !style.castsShadows;
                     }
             );
             UIContainer.addChild(cb);
@@ -285,7 +245,7 @@ package
                     {
                         var text:String = (e.currentTarget as TextInput).text;
                         var color:uint = parseInt(text.indexOf('#') != -1 ? text.split('#')[1] : text, 16);
-                        ambient.color = color;
+                        (ambient.style as LightStyle).color = color;
                     }
             );
             group.addChild(input);

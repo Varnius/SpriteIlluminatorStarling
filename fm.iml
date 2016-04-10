@@ -2,7 +2,7 @@
 <module type="Flex" version="4">
   <component name="FlexBuildConfigurationManager" active="fm">
     <configurations>
-      <configuration name="fm" pure-as="true" main-class="SpriteIlluminatorStarling" output-file="ss.swf" output-folder="$MODULE_DIR$/../StarlingRendererPlus/dist">
+      <configuration name="fm" pure-as="true" main-class="SpriteIlluminatorStarling" output-file="out.swf" output-folder="$MODULE_DIR$/out">
         <dependencies target-player="20.0">
           <entries>
             <entry library-name="src" library-level="project">

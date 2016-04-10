@@ -737,10 +737,10 @@ package feathers.themes
 		 */
 		protected function initializeFonts():void
 		{
-			this.smallFontSize = 10;
-			this.regularFontSize = 12;
-			this.largeFontSize = 14;
-			this.extraLargeFontSize = 18;
+			this.smallFontSize = 15;
+			this.regularFontSize = 17;
+			this.largeFontSize = 20;
+			this.extraLargeFontSize = 22;
 			this.inputFontSize = Math.round(12 * this.stageTextScale);
 
 			//these are for components that don't use FTE
